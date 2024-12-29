@@ -69,15 +69,10 @@ public static class ResultsExtension
             return ResultsTo.Failure<T>("Value is null");
         }
 
-        if(!predicate(results.Value))
-        {
-            return ResultsTo.Failure<T>("Predicate results to false");
-        }
-
-        return results;
+        return !predicate(results.Value) ? ResultsTo.Failure<T>("Predicate results to false") : results;
     }
 
-    public static IResults<T2> Is<T, T2>(this IResults<T> results, Func<T, bool> condition, Func<IResults<T>, IResults<T2>> then)
+    public static IResults<T2> Is<T1, T2>(this IResults<T1> results, Func<T1, bool> condition, Func<IResults<T1>, IResults<T2>> then)
     {
         if (condition(results.Value))
         {
@@ -87,7 +82,7 @@ public static class ResultsExtension
         return (IResults<T2>)false.ToResults();
     }
 
-    public static IResults<T2> Is<T, T2>(this IResults<T> results, Func<T, bool> condition, Func<IResults<T>, IResults<T2>> then, Func<IResults<T>, IResults<T2>> @else)
+    public static IResults<T2> Is<T1, T2>(this IResults<T1> results, Func<T1, bool> condition, Func<IResults<T1>, IResults<T2>> then, Func<IResults<T1>, IResults<T2>> @else)
     {
         if (!results.IsSuccess())
         {
@@ -109,63 +104,27 @@ public static class ResultsExtension
             return results;
         }
 
-        if (predicate(results.Value))
-        {
-            return ResultsTo.Failure<T>().WithMessage(message);
-        }
-
-        return ResultsTo.Success(results.Value);
+        return predicate(results.Value) ?
+            ResultsTo.Failure<T>().WithMessage(message) :
+            ResultsTo.Success(results.Value);
     }
 
     public static IResults<T> Validate<T>(this T results, Func<T, bool> predicate, string message)
     {
-        if (predicate(results))
-        {
-            return ResultsTo.Failure<T>().WithMessage(message);
-        }
-
-        return ResultsTo.Success(results);
+        return predicate(results) ?
+            ResultsTo.Failure<T>().WithMessage(message) :
+            ResultsTo.Success(results);
     }
 
-    public static IResults<T1> Then<T, T1>(this IResults<T> results, Func<T, T1> predicate)
+    public static IResults<T2> Then<T1, T2>(this IResults<T1> results, Func<T1, T2> predicate)
     {
         if (!results.IsSuccess())
         {
-            return ResultsTo.Failure<T1>().FromResults(results);
+            return ResultsTo.Failure<T2>().FromResults(results);
         }
 
         var result = predicate(results.Value);
 
-        return ResultsTo.Something<T1>(result);
+        return ResultsTo.Something<T2>(result);
     }
-
-    // public static IFluentResults OnFailure(this IFluentResults result, Func<IFluentResults> func)
-    // {
-    //     if (result is { } fluentResults && fluentResults.Status == FluentResultsStatus.Failure)
-    //     {
-    //         return func();
-    //     }
-    //
-    //     return result;
-    // }
-    //
-    // public static IFluentResults OnFailure(this IFluentResults result, Action func)
-    // {
-    //     if (result is { } fluentResults && fluentResults.Status == FluentResultsStatus.Failure)
-    //     {
-    //         func();
-    //     }
-    //
-    //     return result;
-    // }
-    //
-    // public static IFluentResults OnSuccess(this IFluentResults result, Func<IFluentResults> func)
-    // {
-    //     if (result is { } fluentResults && fluentResults.Status == FluentResultsStatus.Success)
-    //     {
-    //         return func();
-    //     }
-    //
-    //     return result;
-    // }
 }

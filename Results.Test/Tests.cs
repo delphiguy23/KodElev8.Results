@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Results.Extension;
 
 namespace Results.Test
 {
@@ -11,7 +12,6 @@ namespace Results.Test
             result.IsSuccess().Should().BeTrue();
             result.Value.Should().Be(1);
         }
-
 
         [Fact]
         public void ResultIsNullThenItShouldBeNotFound()
@@ -68,12 +68,28 @@ namespace Results.Test
         public void FromSomethingThenToIs()
         {
             var someValue = 10;
+            var _result = ResultsTo.Failure<int>("Initial failure");;
 
             var result1 = someValue.ToResults(); 
             var result2 = result1.Is(x => x > 5);
+            var result3 = _result.Is(x => x > 5);
 
+            result1.IsSuccess().Should().BeTrue();
             result2.IsSuccess().Should().BeTrue();
             result2.Value.Should().Be(someValue);
+            result3.IsSuccess().Should().BeFalse();
+        }
+
+        [Fact]
+        public void FromSomethingThenToIs1()
+        {
+            string? text = null;
+
+            var result = ResultsTo.Success<string>(null);
+            var _result = result.Is(x => !string.IsNullOrEmpty(x));
+
+            _result.IsFailure().Should().BeTrue();
+            _result.Messages.Should().Contain("Value is null");
         }
 
         [Fact]

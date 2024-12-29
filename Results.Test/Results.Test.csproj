@@ -23,5 +23,9 @@
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Results\Results.csproj" />
+    </ItemGroup>
+
 
 </Project>
