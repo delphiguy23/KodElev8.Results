@@ -2,60 +2,35 @@ namespace Results.Extension;
 
 public static class ResultsExtension
 {
-    public static bool IsSuccess(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.Success;
-    }
+    public static bool IsSuccess(this IResults result) =>
+        result is { Status: ResultsStatus.Success };
 
-    public static bool IsCreated(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.Created;
-    }
+    public static bool IsCreated(this IResults result) =>
+        result is { Status: ResultsStatus.Created };
 
-    public static bool IsUpdated(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.Updated;
-    }
+    public static bool IsUpdated(this IResults result) =>
+        result is { Status: ResultsStatus.Updated };
 
-    public static bool IsDeleted(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.Deleted;
-    }
+    public static bool IsDeleted(this IResults result) =>
+        result is { Status: ResultsStatus.Deleted };
 
-    public static bool IsNotFound(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.NotFound;
-    }
+    public static bool IsNotFound(this IResults result) =>
+        result is { Status: ResultsStatus.NotFound };
 
-    public static bool IsFailure(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.Failure;
-    }
+    public static bool IsFailure(this IResults result) =>
+        result is { Status: ResultsStatus.Failure };
 
-    public static bool IsBadRequest(this IResults result)
-    {
-        return result is { } fluentResults && fluentResults.Status == ResultsStatus.BadRequest;
-    }
+    public static bool IsBadRequest(this IResults result) =>
+        result is { Status: ResultsStatus.BadRequest };
 
-    public static bool IsNotFoundOrBadRequest(this IResults result)
-    {
-        return result is { } fluentResults && (fluentResults.Status == ResultsStatus.BadRequest || fluentResults.Status == ResultsStatus.NotFound || fluentResults.Status == ResultsStatus.Failure);
-    }
+    public static bool IsNotFoundOrBadRequest(this IResults result) =>
+        result is { Status: ResultsStatus.BadRequest or ResultsStatus.NotFound or ResultsStatus.Failure };
 
-    public static IResults OnNotFound(this IResults result, Func<IResults> func)
-    {
-        if (result is { } fluentResults && fluentResults.Status == ResultsStatus.NotFound)
-        {
-            return func();
-        }
+    public static IResults OnNotFound(this IResults result, Func<IResults> func) =>
+        result is { Status: ResultsStatus.NotFound } ? func() : result;
 
-        return result;
-    }
-
-    public static IResults<T> ToResults<T>(this T value)
-    {
-        return ResultsTo.Something<T>(value);
-    }
+    public static IResults<T> ToResults<T>(this T value) =>
+        ResultsTo.Something<T>(value);
 
     public static IResults<T> Is<T>(this IResults<T> results, Func<T, bool> predicate)
     {

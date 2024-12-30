@@ -265,4 +265,123 @@ public class Tests
             }
         }
     }
+
+    [Fact]
+    public void WhenStatusIsSuccessThenReturnIsSuccess()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.Success);
+
+        var isSuccess = mockResult.Object.IsSuccess();
+
+        isSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsCreatedThenReturnIsCreated()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.Created);
+
+        var isCreated = mockResult.Object.IsCreated();
+
+        isCreated.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsUpdatedThenReturnIsUpdated()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.Updated);
+
+        var isUpdated = mockResult.Object.IsUpdated();
+
+        isUpdated.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsDeletedThenReturnIsDeleted()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.Deleted);
+
+        var isDeleted = mockResult.Object.IsDeleted();
+
+        isDeleted.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsNotFoundThenReturnIsNotFound()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.NotFound);
+
+        var isNotFound = mockResult.Object.IsNotFound();
+
+        isNotFound.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsBadRequestThenReturnIsBadRequest()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.BadRequest);
+
+        var isBadRequest = mockResult.Object.IsBadRequest();
+
+        isBadRequest.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsNotFoundOrBadRequestThenReturnIsNotFoundOrBadRequest1()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.NotFound);
+
+        var isNotFoundOrBadRequest = mockResult.Object.IsNotFoundOrBadRequest();
+
+        isNotFoundOrBadRequest.Should().BeTrue();
+    }
+
+    [Fact]
+    public void WhenStatusIsNotFoundOrBadRequestThenReturnIsNotFoundOrBadRequest2()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.BadRequest);
+
+        var isNotFoundOrBadRequest = mockResult.Object.IsNotFoundOrBadRequest();
+
+        isNotFoundOrBadRequest.Should().BeTrue();
+    }
+
+    [Fact]
+    public void OnNotFound_ShouldInvokeFunc_WhenResultIsNotFound()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.NotFound);
+
+        var mockFunc = new Mock<Func<IResults>>();
+        var expectedResult = new Mock<IResults>();
+        mockFunc.Setup(f => f()).Returns(expectedResult.Object);
+
+        var actual = mockResult.Object.OnNotFound(mockFunc.Object);
+
+        mockFunc.Verify(f => f(), Times.Once);
+        actual.Should().Be(expectedResult.Object);
+    }
+
+    [Fact]
+    public void OnNotFound_ShouldReturnOriginalResult_WhenResultIsNotNotFound()
+    {
+        var mockResult = new Mock<IResults>();
+        mockResult.Setup(r => r.Status).Returns(ResultsStatus.Success);
+
+        var mockFunc = new Mock<Func<IResults>>();
+
+        var actual = mockResult.Object.OnNotFound(mockFunc.Object);
+
+        mockFunc.Verify(f => f(), Times.Never);
+        actual.Should().Be(mockResult.Object);
+    }
+
 }
